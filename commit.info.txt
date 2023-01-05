@@ -1,10 +1,2 @@
-BASE USING
-node app.js     // Start server
-Ctrl + C        // Abort server
-INSTALLING NODEMON
-npm i nodemon --save-dev
-"devDependencies": { "nodemon": "^2.0.20" }
-"scripts": { "watch": "nodemon app.js" }
-NODEMON USING
-nodemon app.js  // Start server with nodemon
-npm run watch   // Run script 'watch'
+Лекція по монгусу від Віктора
+https://www.youtube.com/watch?v=zMlIkw-UvrU&list=PLEjVWyPM0sZqbRoaBdibjym2fhSDrv5r4&index=19
