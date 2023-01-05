@@ -4,6 +4,7 @@ const rolesEnum = require("../configs/roles.enum");
 const UserScheme = new mongoose.Schema({
         name: {type: String, trim: true, default: ''},
         email: {type: String, trim: true, lowercase: true, required: true, unique: true},
+        password: {type: String, required: true},
         role: {type: String, enum: Object.values(rolesEnum), default: rolesEnum.USER}
     },
     {

@@ -13,7 +13,7 @@ module.exports = {
 
     getUserById: async (req, res) => {
         try {
-            const user = await userService.findOneUser({_id: Object.values(req.params)})
+            const user = await userService.findOneUser({_id: req.params.userId})
             res.status(200).json(user);
         } catch (e) {
             console.log(e);
