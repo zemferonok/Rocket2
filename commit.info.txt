@@ -1,3 +1,5 @@
-Вподобав Діану, приклад для наслівування.
-https://github.com/dShymkiv/Rocket2
+JSDoc
+Закос під типізацію для JS, TypeScript на лайтах.
 
+Відео-приклад пояснення від Віктора.
+https://www.youtube.com/watch?v=qIxwkMhG2FQ&list=PLEjVWyPM0sZqbRoaBdibjym2fhSDrv5r4&index=25&t=3670s
