@@ -1,94 +1,73 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const util = require('node:util');
 
 
-function mkDir(pathToFolder) {
-  fs.mkdir(pathToFolder, {recursive: true}, (err) => {
-    if (err) return console.log(err);
-  });
+/*
+ * Async, Await та Promises.
+ * Async активує режим очікування у функції.
+ * Await очікує на поверненя обіцянки функії.
+ * Використовується для синхронізації дій
+ * і очікування асинхронних дій функцій.
+ */
+
+
+async function mkDir(pathToFolder) {
+  await fs.promises.mkdir(pathToFolder, {recursive: true})
+    .catch(err => console.log(err));
 }
 
-function readDir(pathToFolder) {
-  fs.readdir(pathToFolder, (err, data) => {
-    if (err) return console.log(err);
-    console.log(data);
-  });
+async function readDir(pathToFolder) {
+  await fs.promises.readdir(pathToFolder)
+    .then(data => console.log(data))
+    .catch(err => console.log(err));
 }
 
-function readDirAdv(pathToFolder) {
-  fs.readdir(pathToFolder, {withFileTypes: true}, (err, data) => {
-    if (err) return console.log(err);
-    console.log(data);
-
-    for (const element of data) {
-      console.log(element.name, 'is File', element.isFile());
-    }
-  });
+async function readDirAdv(pathToFolder) {
+  await fs.promises.readdir(pathToFolder, {withFileTypes: true})
+    .then(data => {
+      console.log(data);
+      data.forEach(value => console.log(value.name, 'is File', value.isFile()));
+    })
+    .catch(err => console.log(err));
 }
 
-function rmDir(pathToFolder) {
-  fs.rmdir(pathToFolder, {recursive: true}, (err) => {
-    if (err) console.log(err);
-  });
+async function rmDir(pathToFolder) {
+  await fs.promises.rmdir(pathToFolder, {recursive: true})
+    .catch(err => console.log(err));
 }
 
-function writeFile(pathToFile, dataForWrite) {
-  fs.writeFile(pathToFile, dataForWrite, (err) => {
-    if (err) console.log(err);
-  });
+
+async function writeFile(pathToFile, dataForWrite) {
+  await fs.promises.writeFile(pathToFile, dataForWrite)
+    .catch(err => console.log(err));
 } // Will create File if it not exists
 
-function appendFile(pathToFile, dataForAppend) {
-  fs.appendFile(pathToFile, '\n' + dataForAppend, (err) => {
-    if (err) console.log(err);
-  });
+async function appendFile(pathToFile, dataForAppend) {
+  await fs.promises.appendFile(pathToFile, '\n' + dataForAppend)
+    .catch(err => console.log(err));
 } // Will create File if it not exists
 
-function readFile(pathToFile) {
-  fs.readFile(pathToFile, (err, data) => {
-    if (err) return console.log(err);
-    console.log(data.toString());
-  });
+async function readFile(pathToFile) {
+  await fs.promises.readFile(pathToFile)
+    .then(data => console.log(data.toString()))
+    .catch(err => console.log(err));
 }
 
-function clearFile(pathToFile) {
-  fs.truncate(pathToFile, (err) => {
-    if (err) return console.log(err);
-    console.log('File was cleared')
-  });
+async function clearFile(pathToFile) {
+  await fs.promises.truncate(pathToFile)
+    .catch(err => console.log(err));
 }
 
-function moveFile(pathToFile, newPathToFile) {
-  fs.rename(pathToFile, newPathToFile, (err) => {
-    if (err) return console.log(err);
-    console.log('The file was moved and renamed');
-  });
+async function moveFile(pathToFile, newPathToFile) {
+  await fs.promises.rename(pathToFile, newPathToFile)
+    .catch(err => console.log(err));
 }
 
-function rmFile(pathToFile) {
-  fs.unlink(pathToFile, (err) => {
-    if (err) return console.log(err);
-    console.log('File was deleted');
-  });
+async function rmFile(pathToFile) {
+  await fs.promises.unlink(pathToFile)
+    .catch(err => console.log(err));
 }
-
-
-// const pathToFolder = './Dir';
-// const pathToFolderAdv = './Dir/Trash';
-// const pathToFile = './Dir/file.txt';
-// const newPathToFile = './Dir/Trash/badFile.txt';
-
-// mkDir(pathToFolderAdv);
-// readDir(pathToFolder);
-// readDirAdv(pathToFolder);
-// rmDir(pathToFolder);
-
-// writeFile(pathToFile);
-// appendFile(pathToFile);
-// readFile(pathToFile);
-// clearFile(pathToFile);
-// moveFile(pathToFile, newPathToFile);
-// rmFile(newPathToFile);
 
 
 console.log(__dirname, '__dirname');
@@ -101,43 +80,39 @@ const newPathToFile = path.join(pathToFolderAdv, 'badFile.txt');
 const dataForWrite = 'First String';
 const dataForAppend = 'Appended String';
 
-setTimeout(() => {
-  console.log('mkDir');
-  mkDir(pathToFolderAdv);
-}, 1000);
-setTimeout(() => {
-  console.log('writeFile');
-  writeFile(pathToFile, dataForWrite);
-}, 2000);
-setTimeout(() => {
-  console.log('readDir');
-  readDir(pathToFolder);
-}, 3000);
-setTimeout(() => {
-  console.log('readDirAdv');
-  readDirAdv(pathToFolder);
-}, 4000);
-setTimeout(() => {
-  console.log('appendFile');
-  appendFile(pathToFile, dataForAppend);
-}, 5000);
-setTimeout(() => {
-  console.log('readFile');
-  readFile(pathToFile);
-}, 6000);
-setTimeout(() => {
-  console.log('clearFile');
-  clearFile(pathToFile);
-}, 7000);
-setTimeout(() => {
-  console.log('moveFile');
-  moveFile(pathToFile, newPathToFile);
-}, 8000);
-setTimeout(() => {
-  console.log('rmFile');
-  rmFile(newPathToFile);
-}, 9000);
-setTimeout(() => {
-  console.log('rmDir');
-  rmDir(pathToFolder);
-}, 10000);
+const setTimeoutP = util.promisify(setTimeout);
+// Make Promise from Function with call-back
+
+const go = async () => {
+  await setTimeoutP(1000).then(() => console.log('mkDir'));
+  await mkDir(pathToFolderAdv);
+
+  await setTimeoutP(1000).then(() => console.log('writeFile'));
+  await writeFile(pathToFile, dataForWrite);
+
+  await setTimeoutP(1000).then(() => console.log('readDir'));
+  await readDir(pathToFolder);
+
+  await setTimeoutP(1000).then(() => console.log('readDirAdv'));
+  await readDirAdv(pathToFolder);
+
+  await setTimeoutP(1000).then(() => console.log('appendFile'));
+  await appendFile(pathToFile, dataForAppend);
+
+  await setTimeoutP(1000).then(() => console.log('readFile'));
+  await readFile(pathToFile);
+
+  await setTimeoutP(1000).then(() => console.log('clearFile'));
+  await clearFile(pathToFile);
+
+  await setTimeoutP(1000).then(() => console.log('moveFile'));
+  await moveFile(pathToFile, newPathToFile);
+
+  await setTimeoutP(1000).then(() => console.log('rmFile'));
+  await rmFile(newPathToFile);
+
+  await setTimeoutP(1000).then(() => console.log('rmDir'));
+  await rmDir(pathToFolder);
+}
+
+go().then();

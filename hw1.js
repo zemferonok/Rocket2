@@ -1,5 +1,6 @@
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
+const util = require('node:util');
 
 /*Сортувальна Шляпа Хогвартса.
 * Посортувати дітей по Факультетах.
@@ -27,62 +28,56 @@ const girls = [
   {name: 'Karl', gender: 'male', status: true},
 ];
 
-function putPersonsInFolder(persons = [], pathToFolder = '') {
-  fs.mkdir(pathToFolder, {recursive: true}, (err) => {
-    if (err) return console.log(err);
+const setTimeoutP = util.promisify(setTimeout);
 
-    for (const person of persons) {
-      const pathToFile = path.join(pathToFolder, `${person.name}.txt`);
-      fs.writeFile(pathToFile, JSON.stringify(person, null, 2), (err) => {
-        if (err) console.log(err);
-      });
-    }
-  });
+async function putPersonsInFolder(persons = [], pathToFolder = '') {
+  await fs.mkdir(pathToFolder, {recursive: true})
+    .catch(err => console.log(err));
+
+  for (const person of persons) {   // Cycles can await, as opposed to forEach
+    const pathToFile = path.join(pathToFolder, `${person.name}.txt`);
+    await fs.writeFile(pathToFile, JSON.stringify(person, null, 2))
+      .catch(err => console.log(err));
+    await setTimeoutP(1000).then(() => console.log(person.name, ' has added'));
+  }
 }
 
-function moveFakeFromTo(fakeGender = 'male', pathFromFolder = '', pathToFolder = '') {
-  fs.readdir(pathFromFolder, (err, data) => {
-    if (err) return console.log(err);
+async function moveFakeFromTo(fakeGender = 'male', pathFromFolder = '', pathToFolder = '') {
+  const folderData = await fs.readdir(pathFromFolder)
+    .catch(err => console.log(err));
 
-    for (const element of data) {
-      const pathToFile = path.join(pathFromFolder, element);
+  for (const folderFile of folderData) {
+    const pathToFile = path.join(pathFromFolder, folderFile);
+    const person = await fs.readFile(pathToFile)
+      .then(data => JSON.parse(data.toString()))
+      .catch(err => console.log(err));
 
-      fs.readFile(pathToFile, (err, data) => {
-        if (err) return console.log(err);
-
-        const person = JSON.parse(data.toString());
-        if (person.gender === fakeGender) {
-          // console.log(person.name, 'is IMPOSTER');
-
-          const newPathToFile = path.join(pathToFolder, element);
-          fs.rename(pathToFile, newPathToFile, (err) => {
-            if (err) return console.log(err);
-          });
-        }
-      });
+    if (person.gender === fakeGender) {
+      const newPathToFile = path.join(pathToFolder, folderFile);
+      await fs.rename(pathToFile, newPathToFile)
+        .catch(err => console.log(err));
     }
-  });
+  }
 }
 
 
 const girlsPath = path.join('HomeVideos', 'Girls');
 const boysPath = path.join('HomeVideos', 'Boys');
 
-setTimeout(() => {
+const go = async () => {
   console.log('putPersonsInFolder');
-  putPersonsInFolder(girls, girlsPath);
-  putPersonsInFolder(boys, boysPath);
-}, 1000);
+  await putPersonsInFolder(girls, girlsPath);
+  await putPersonsInFolder(boys, boysPath);
+  await setTimeoutP(10000).then();
 
-setTimeout(() => {
   console.log('moveFakeFromTo');
-  moveFakeFromTo('male', girlsPath, boysPath);
-  moveFakeFromTo('female', boysPath, girlsPath);
-}, 10000);
+  await moveFakeFromTo('male', girlsPath, boysPath);
+  await moveFakeFromTo('female', boysPath, girlsPath);
+  await setTimeoutP(10000).then();
 
-setTimeout(()=>{
   console.log('rm HomeVideos')
-  fs.rm('./HomeVideos', {recursive: true}, (err) => {
-    if (err) console.log(err);
-  });
-}, 20000);
+  await fs.rm('./HomeVideos', {recursive: true})
+    .catch(err => console.log(err));
+}
+
+go().then();
