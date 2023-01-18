@@ -1,5 +1,6 @@
 const userService = require('./user.service');
 
+
 const getUsers = async (req, res) => {
   try {
     const users = await userService.findUsers();
@@ -12,9 +13,7 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    // Getting 'userId' from link params
-    // const userId = req.params.userId;
-    const userId = Object.values(req.params);
+    const userId = Number(Object.values(req.params));
     const user = await userService.findUserById(userId);
     res.status(200).json(user);
   } catch (e) {
@@ -35,7 +34,8 @@ const createUser = async (req, res) => {
 
 const updateUserById = async (req, res) => {
   try {
-    const updatedUser = await userService.updateOneUser(Object.values(req.params), req.body);
+    const userId = Number(Object.values(req.params));
+    const updatedUser = await userService.updateOneUser(userId, req.body);
     res.status(202).json(updatedUser);
   } catch (e) {
     console.log(e);
@@ -45,7 +45,8 @@ const updateUserById = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    await userService.deleteOneUser(Object.values(req.params));
+    const userId = Number(Object.values(req.params));
+    await userService.deleteOneUser(userId);
     res.status(204).json('User deleted');
   } catch (e) {
     console.log(e);

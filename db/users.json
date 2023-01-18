@@ -9,26 +9,12 @@
   {
     "id": 2,
     "firstName": "Mari",
-    "lastName": "Hertz",
-    "email": "Simpl@life.com",
-    "password": "PassWord"
-  },
-  {
-    "id": 3,
-    "firstName": "Mari",
     "lastName": "Cuirie",
     "email": "Simpl@life.com",
     "password": "PassWord"
   },
   {
-    "id": 4,
-    "firstName": "Mari",
-    "lastName": "Hertz",
-    "email": "Simpl@life.com",
-    "password": "PassWord"
-  },
-  {
-    "id": 5,
+    "id": 3,
     "firstName": "Mari",
     "lastName": "Hertz",
     "email": "Simpl@life.com",

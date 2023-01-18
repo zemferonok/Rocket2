@@ -1,5 +1,10 @@
 Write command in Terminal
 
-node -v         Check the Version of Node
-node app        Run app file in current dir
-node app.js     The same as above
+node -v             Check the Version of Node
+node app            Run app file in current dir
+node app.js         The same as above
+
+nodemon app.js      Run app.js file with nodemon
+nodemon             Run the main file from package.json with nodemon
+npm run watch       Run 'watch' script from package.json
+CTRL + C            Stop server listening and nodemon watching

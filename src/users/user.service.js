@@ -4,19 +4,26 @@ const fileService = require('../../services/file.service');
 
 const pathToUsersDB = path.join(process.cwd(), "db", "users.json");
 
-
+/**
+ * Find_Users
+ * @returns {Promise<Array<{id:Number, firstName: String, lastName: String, email:String, password: String}>>}
+ */
 async function findUsers() {
   const users = await fileService.readFile(pathToUsersDB);
   if (!users) throw new Error('Users not found');
-  // All errors will be caught in 'user.controller'
   return users;
 }
 
+/**
+ * Find_User
+ * @param userId {Number} ID for searching user
+ * @returns {Promise<{id: Number, firstName: String, lastName: String, email:String, password: String}>} User Object
+ */
 async function findUserById(userId) {
   const users = await findUsers();
 
   for (const user of users) {
-    if (user.id === Number(userId)) {
+    if (user.id === userId) {
       return user;
     }
   }
@@ -24,11 +31,19 @@ async function findUserById(userId) {
   throw new Error("User doesn't exists");
 }
 
+/**
+ * Create_User
+ * @param firstName {String} User Name
+ * @param lastName {String} User Surname
+ * @param email {String} User Email
+ * @param password {String} User PassWord
+ * @returns {Promise<{id: Number, firstName: String, lastName: String, email: String, password: String}>} Created User
+ // * @returns {Promise<{firstName, lastName, password, id, email}>} Created User without dataType details
+ */
 async function createUser({firstName, lastName, email, password}) {
-  // const users = [...await fileService.readFile(pathToUsersDB)];
-  const users = [...await findUsers(pathToUsersDB)];
-  const id = (!users.length) ? 1 : users[users.length - 1].id + 1;
+  const users = await findUsers();
 
+  const id = (!users.length) ? 1 : users[users.length - 1].id + 1;
   const newUser = {id, firstName, lastName, email, password};
   users.push(newUser);
 
@@ -36,12 +51,18 @@ async function createUser({firstName, lastName, email, password}) {
   return newUser;
 }
 
+/**
+ * Update_User
+ * @param userId {Number} ID for searching user
+ * @param dataForUpdate {{firstName: String, lastName: String, email: String, password: String}} Data for update
+ * @returns {Promise<{id: Number, firstName: String, lastName: String, password: String}>} Updated User
+ */
 async function updateOneUser(userId, dataForUpdate) {
   let userForUpdate = await findUserById(Number(userId));
   const users = await findUsers();
 
   const newUsers = users.map(user => {
-    if (user.id === Number(userId)) {
+    if (user.id === userId) {
       if (dataForUpdate?.firstName) {
         user.firstName = dataForUpdate.firstName;
       }
@@ -63,6 +84,11 @@ async function updateOneUser(userId, dataForUpdate) {
   return userForUpdate;
 }
 
+/**
+ * Delete_User
+ * @param userId {Number} ID for searching user
+ * @returns {Promise<void>} Nothing for return
+ */
 async function deleteOneUser(userId) {
   const imposter = await findUserById(Number(userId));
   const users = await findUsers();
