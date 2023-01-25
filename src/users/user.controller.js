@@ -1,56 +1,51 @@
 const userService = require('./user.service');
 
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await userService.findUsers();
     res.status(200).json(users);
   } catch (e) {
-    console.log(e);
-    res.status(400).json({message: e.message});
+    next(e);  // Throw error to app.js >> mainErrorHandler
   }
 };
 
-const getUserById = async (req, res) => {
+const getUserById = async (req, res, next) => {
   try {
     const userId = Number(Object.values(req.params));
     const user = await userService.findUserById(userId);
     res.status(200).json(user);
   } catch (e) {
-    console.log(e);
-    res.status(400).json({message: e.message});
+    next(e);
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     const user = await userService.createUser(req.body);
     res.status(201).json(user);
   } catch (e) {
-    console.log(e);
-    res.status(400).json({message: e.message});
+    next(e);
   }
 };
 
-const updateUserById = async (req, res) => {
+const updateUserById = async (req, res, next) => {
   try {
     const userId = Number(Object.values(req.params));
     const updatedUser = await userService.updateOneUser(userId, req.body);
     res.status(202).json(updatedUser);
   } catch (e) {
-    console.log(e);
-    res.status(400).json({message: e.message});
+    next(e);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
     const userId = Number(Object.values(req.params));
     await userService.deleteOneUser(userId);
     res.status(204).json('User deleted');
   } catch (e) {
-    console.log(e);
-    res.status(400).json({message: e.message});
+    next(e);
   }
 };
 

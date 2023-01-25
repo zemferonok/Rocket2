@@ -7,4 +7,5 @@ node app.js         The same as above
 nodemon app.js      Run app.js file with nodemon
 nodemon             Run the main file from package.json with nodemon
 npm run watch       Run 'watch' script from package.json
+npx nodemon app.js  Run nodemon app.js with temporary installing
 CTRL + C            Stop server listening and nodemon watching

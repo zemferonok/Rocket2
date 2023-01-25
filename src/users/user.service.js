@@ -1,6 +1,7 @@
 const path = require('node:path');
 
 const fileService = require('../../services/file.service');
+const ApiError = require("../../errors/ApiError");
 
 const pathToUsersDB = path.join(process.cwd(), "db", "users.json");
 
@@ -10,7 +11,7 @@ const pathToUsersDB = path.join(process.cwd(), "db", "users.json");
  */
 async function findUsers() {
   const users = await fileService.readFile(pathToUsersDB);
-  if (!users) throw new Error('Users not found');
+  if (!users) throw new ApiError.NotFound('Users not found');
   return users;
 }
 
@@ -28,7 +29,7 @@ async function findUserById(userId) {
     }
   }
 
-  throw new Error("User doesn't exists");
+  throw new ApiError.NotFound('User doesn\'t exists');
 }
 
 /**
@@ -38,7 +39,6 @@ async function findUserById(userId) {
  * @param email {String} User Email
  * @param password {String} User PassWord
  * @returns {Promise<{id: Number, firstName: String, lastName: String, email: String, password: String}>} Created User
- // * @returns {Promise<{firstName, lastName, password, id, email}>} Created User without dataType details
  */
 async function createUser({firstName, lastName, email, password}) {
   const users = await findUsers();
