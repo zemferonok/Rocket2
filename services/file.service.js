@@ -7,6 +7,7 @@ const fs = require('node:fs/promises');
  */
 async function readFile(pathToFile) {
   const data = await fs.readFile(pathToFile);
+  if (data.toString().length === 0) return [];
   return JSON.parse(data.toString());
 }
 
