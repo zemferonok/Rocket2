@@ -1,6 +1,6 @@
 const express = require('express');
 
-require('dotenv').config(); // Activate .env data
+require('dotenv').config();
 const {PORT} = require('./configs/config');
 const router = require('./src/router');
 const ApiError = require("./errors/ApiError");
@@ -13,10 +13,10 @@ app.use('/', router);
 app.use('*', (req, res, next) => {
   return next(new ApiError.NotFound(`Rout ${req.baseUrl} not found`));
 });
-app.use(mainErrorHandler);  // Catch every 'next(e)' with Error
+app.use(mainErrorHandler);
 
 app.listen(PORT, () => {
-  console.log(`PORT: ${PORT} is listening..`);
+  console.log(`PORT: ${PORT} is listening...`);
 });
 
 function mainErrorHandler(err, req, res, next) {

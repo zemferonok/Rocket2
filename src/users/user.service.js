@@ -1,18 +1,16 @@
 const path = require('node:path');
 
 const fileService = require('../../services/file.service');
-const ApiError = require("../../errors/ApiError");
 
 const pathToUsersDB = path.join(process.cwd(), "db", "users.json");
+
 
 /**
  * Find_Users
  * @returns {Promise<Array<{id:Number, firstName: String, lastName: String, email:String, password: String}>>}
  */
 async function findUsers() {
-  const users = await fileService.readFile(pathToUsersDB);
-  if (!users) throw new ApiError.NotFound('Users not found');
-  return users;
+  return await fileService.readFile(pathToUsersDB);
 }
 
 /**
@@ -22,14 +20,7 @@ async function findUsers() {
  */
 async function findUserById(userId) {
   const users = await findUsers();
-
-  for (const user of users) {
-    if (user.id === userId) {
-      return user;
-    }
-  }
-
-  throw new ApiError.NotFound('User doesn\'t exists');
+  return users.find(user => user.id === userId);
 }
 
 /**
@@ -90,11 +81,9 @@ async function updateOneUser(userId, dataForUpdate) {
  * @returns {Promise<void>} Nothing for return
  */
 async function deleteOneUser(userId) {
-  const imposter = await findUserById(Number(userId));
   const users = await findUsers();
-
-  const newUsers = users.filter(user => user.id !== imposter.id);
-  await fileService.writeFile(pathToUsersDB, newUsers);
+  const updatedUsers = users.filter(user => user.id !== userId);
+  await fileService.writeFile(pathToUsersDB, updatedUsers);
 }
 
 
