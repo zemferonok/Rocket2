@@ -1,16 +1,19 @@
 const ApiError = require('../../errors/ApiError');
 const userService = require("./user.service");
+const { Types } = require('mongoose');
 
 /**
- // * For fixing alert in "user.router.js"
- * @returns {void}
+ *
+ * @returns {void} For fixing alert in [user.router.js]
  */
 const isUserExist = async (req, res, next) => {
   try {
-    const users = await userService.findUsers();
-    const userId = Number(Object.values(req.params));
+    const userId = Object.values(req.params).toString();
+    if (!Types.ObjectId.isValid(userId)) {  // Verify MongoId
+      throw new ApiError.BadRequest('Not valid ID');
+    }
 
-    const user = users.find(user => user.id === userId);
+    const user = await userService.findUserById(userId);
     if (!user) throw new ApiError.NotFound('User doesn\'t exists');
 
     // req.user = user;  // TODO Reduce MongoDB requests
@@ -35,7 +38,7 @@ const isInputDataValid = async (req, res, next) => {
   try {
     const firstName = req.body?.firstName;
     const lastName = req.body?.lastName;
-    const email = req.body?.email;
+    const email = req.body?.email.toString().toLowerCase().trim();
     const password = req.body?.password;
 
     if (firstName && (firstName.length <= 2 || firstName.length >= 20)) {

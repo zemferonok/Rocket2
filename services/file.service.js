@@ -4,12 +4,11 @@ const fs = require('node:fs/promises');
 /**
  * Read_File
  * @param pathToFile {String} Path to file for reading
- * @returns {Promise} Processed data from file
+ * @returns {Promise<String>} Processed data from file
  */
 async function readFile(pathToFile) {
   const data = await fs.readFile(pathToFile);
-  if (data.toString().length === 0) return [];
-  return JSON.parse(data.toString());
+  return data.toString();
 }
 
 /**

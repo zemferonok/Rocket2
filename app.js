@@ -1,7 +1,8 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 require('dotenv').config();
-const {PORT} = require('./configs/config');
+const {PORT, MONGO_URL} = require('./configs/config');
 const router = require('./src/router');
 const ApiError = require("./errors/ApiError");
 
@@ -15,7 +16,19 @@ app.use('*', (req, res, next) => {
 });
 app.use(mainErrorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  try {
+    mongoose.set('debug', true);
+    mongoose.set('strictQuery', true);
+    const connection = await mongoose.connect(MONGO_URL);
+
+    if (connection) {
+      console.log('DB connected');
+    }
+  } catch (err) {
+    if (err) console.log(err);
+    process.exit(1);
+  }
   console.log(`PORT: ${PORT} is listening...`);
 });
 

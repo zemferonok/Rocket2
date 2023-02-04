@@ -12,7 +12,7 @@ const getUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const userId = Number(Object.values(req.params));
+    const userId = Object.values(req.params).toString();
     const user = await userService.findUserById(userId);
     res.status(200).json(user);
   } catch (e) {
@@ -31,7 +31,7 @@ const createUser = async (req, res, next) => {
 
 const updateUserById = async (req, res, next) => {
   try {
-    const userId = Number(Object.values(req.params));
+    const userId = Object.values(req.params).toString();
     const updatedUser = await userService.updateOneUser(userId, req.body);
     res.status(202).json(updatedUser);
   } catch (e) {
@@ -41,8 +41,9 @@ const updateUserById = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    const userId = Number(Object.values(req.params));
+    const userId = Object.values(req.params).toString();
     await userService.deleteOneUser(userId);
+    // res.status(200).json('User deleted');
     res.status(204).json('User deleted');
   } catch (e) {
     next(e);

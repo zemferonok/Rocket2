@@ -1,26 +1,23 @@
-const path = require('node:path');
-
-const fileService = require('../../services/file.service');
-
-const pathToUsersDB = path.join(process.cwd(), "db", "users.json");
+const User = require('../../db/User');
 
 
 /**
  * Find_Users
- * @returns {Promise<Array<{id:Number, firstName: String, lastName: String, email:String, password: String}>>}
+ * @returns {Promise<Array<{id, firstName: String, lastName: String, email:String, password: String}>>}
  */
 async function findUsers() {
-  return await fileService.readFile(pathToUsersDB);
+  const users = await User.find();
+  return users;
 }
 
 /**
  * Find_User
- * @param userId {Number} ID for searching user
- * @returns {Promise<{id: Number, firstName: String, lastName: String, email:String, password: String}>} User Object
+ * @param userId {String} ID for searching user
+ * @returns {Promise<{id, firstName: String, lastName: String, email:String, password: String}>} User Object
  */
 async function findUserById(userId) {
-  const users = await findUsers();
-  return users.find(user => user.id === userId);
+  const user = await User.findById(userId);
+  return user;
 }
 
 /**
@@ -29,61 +26,46 @@ async function findUserById(userId) {
  * @param lastName {String} User Surname
  * @param email {String} User Email
  * @param password {String} User PassWord
- * @returns {Promise<{id: Number, firstName: String, lastName: String, email: String, password: String}>} Created User
+ * @returns {Promise<{id, firstName: String, lastName: String, email: String, password: String}>} Created User
  */
 async function createUser({firstName, lastName, email, password}) {
-  const users = await findUsers();
-
-  const id = (!users.length) ? 1 : users[users.length - 1].id + 1;
-  const newUser = {id, firstName, lastName, email, password};
-  users.push(newUser);
-
-  await fileService.writeFile(pathToUsersDB, users);
+  const user = {firstName, lastName, email, password};
+  const newUser = await User.create(user);
   return newUser;
 }
 
 /**
  * Update_User
- * @param userId {Number} ID for searching user
+ * @param userId {String} ID for searching user
  * @param dataForUpdate {{firstName: String, lastName: String, email: String, password: String}} Data for update
- * @returns {Promise<{id: Number, firstName: String, lastName: String, password: String}>} Updated User
+ * @param options {{new: Boolean}} Return updated user
+ * @returns {Promise<{id, firstName: String, lastName: String, password: String}>} Updated User
  */
-async function updateOneUser(userId, dataForUpdate) {
-  let userForUpdate = await findUserById(Number(userId));
-  const users = await findUsers();
+async function updateOneUser(userId, dataForUpdate, options = {new: true}) {
+  if (!dataForUpdate.firstName) {
+    delete dataForUpdate.firstName;
+  }
+  if (!dataForUpdate.lastName) {
+    delete dataForUpdate.lastName;
+  }
+  if (!dataForUpdate.email) {
+    delete dataForUpdate.email;
+  }
+  if (!dataForUpdate.password) {
+    delete dataForUpdate.password;
+  }
 
-  const newUsers = users.map(user => {
-    if (user.id === userId) {
-      if (dataForUpdate?.firstName) {
-        user.firstName = dataForUpdate.firstName;
-      }
-      if (dataForUpdate?.lastName) {
-        user.lastName = dataForUpdate.lastName;
-      }
-      if (dataForUpdate?.email) {
-        user.email = dataForUpdate.email;
-      }
-      if (dataForUpdate?.password) {
-        user.password = dataForUpdate.password;
-      }
-      userForUpdate = user;
-    }
-    return user;
-  });
-
-  await fileService.writeFile(pathToUsersDB, newUsers);
-  return userForUpdate;
+  const updatedUser = await User.findByIdAndUpdate(userId, dataForUpdate, options);
+  return updatedUser;
 }
 
 /**
  * Delete_User
- * @param userId {Number} ID for searching user
+ * @param userId {String} ID for searching user
  * @returns {Promise<void>} Nothing for return
  */
 async function deleteOneUser(userId) {
-  const users = await findUsers();
-  const updatedUsers = users.filter(user => user.id !== userId);
-  await fileService.writeFile(pathToUsersDB, updatedUsers);
+  await User.findByIdAndDelete(userId);
 }
 
 
